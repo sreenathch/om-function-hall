@@ -186,19 +186,6 @@ export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", date: "", event: "", guests: "", message: "" });
   const [showModal, setShowModal] = useState(false);
-  const [googleReviews, setGoogleReviews] = useState(null);
-
-  // Fetch Google Reviews
-  useEffect(() => {
-    fetch('/om-function-hall/reviews.json')
-      .then(res => res.json())
-      .then(data => {
-        if (data.reviews && data.reviews.length > 0) {
-          setGoogleReviews(data);
-        }
-      })
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -276,9 +263,12 @@ export default function App() {
   ];
 
   const testimonials = [
-    { name: "Rajesh & Priya", initials: "RP", event: "Wedding — Dec 2024", text: "Our wedding at Om Function Hall was wonderful! The spacious halls, separate dining area, and helpful staff made our special day perfect. Great value for families.", stars: 5 },
-    { name: "Srinivas Reddy", initials: "SR", event: "Family Function — Jan 2025", text: "We hosted our daughter's engagement here. The venue is spacious, clean, and the management was very cooperative. Highly recommended for family events!", stars: 5 },
-    { name: "Lakshmi & Family", initials: "LF", event: "Birthday Party — Nov 2024", text: "Celebrated my father's 60th birthday here. The hall was perfect for 400 guests, decorations were beautiful, and the food was delicious. Very affordable!", stars: 5 },
+    { name: "Nagesh", initials: "N", event: "Wedding", text: "Loved to have my wedding function here!", stars: 5 },
+    { name: "Rahul Reddy", initials: "RR", event: "Family Function", text: "A function hall with good amenities and basic infrastructure. Perfect for middle class people to celebrate in their own style. Parking is enough for 10-15 cars and 30+ bikes.", stars: 5 },
+    { name: "Vijay Gouni", initials: "VG", event: "Event", text: "Best function hall in Kuravi!", stars: 5 },
+    { name: "Manoj Yadav", initials: "MY", event: "Function", text: "A good place for different functions and rituals.", stars: 5 },
+    { name: "Madhu Katla", initials: "MK", event: "Event", text: "The best! Good food in Mahabubabad.", stars: 5 },
+    { name: "Suresh Nani", initials: "SN", event: "Function", text: "Good place to do functions.", stars: 5 },
   ];
 
   const particles = Array.from({ length: 20 }, (_, i) => ({
@@ -510,58 +500,30 @@ export default function App() {
       {/* ─── Testimonials ─── */}
       <section className="section section-dark" id="testimonials">
         <div className="section-header animate-on-scroll">
-          <div className="section-tag">Happy Families</div>
+          <div className="section-tag">Google Reviews</div>
           <h2 className="section-title">What Our Guests Say</h2>
-          <p className="section-desc">
-            {googleReviews ? (
-              <>Rated <strong>{googleReviews.rating}</strong> ★ based on {googleReviews.totalReviews} Google reviews</>
-            ) : (
-              "Hear from families who celebrated their special moments with us."
-            )}
-          </p>
+          <p className="section-desc">Real reviews from families who celebrated their special moments with us.</p>
         </div>
         <div className="testimonials-track">
-          {googleReviews && googleReviews.reviews.length > 0 ? (
-            googleReviews.reviews.slice(0, 6).map((r, i) => (
-              <div key={i} className="testimonial-card animate-on-scroll" style={{ animationDelay: `${i * 0.15}s` }}>
-                <div className="testimonial-stars">{"★".repeat(r.rating)}</div>
-                <p className="testimonial-text">"{r.text}"</p>
-                <div className="testimonial-author">
-                  {r.photo ? (
-                    <img src={r.photo} alt={r.author} className="testimonial-avatar-img" />
-                  ) : (
-                    <div className="testimonial-avatar">{r.author.split(' ').map(n => n[0]).join('').slice(0, 2)}</div>
-                  )}
-                  <div>
-                    <div className="testimonial-name">{r.author}</div>
-                    <div className="testimonial-event">{r.time}</div>
-                  </div>
+          {testimonials.map((t, i) => (
+            <div key={i} className="testimonial-card animate-on-scroll" style={{ animationDelay: `${i * 0.15}s` }}>
+              <div className="testimonial-stars">{"★".repeat(t.stars)}</div>
+              <p className="testimonial-text">"{t.text}"</p>
+              <div className="testimonial-author">
+                <div className="testimonial-avatar">{t.initials}</div>
+                <div>
+                  <div className="testimonial-name">{t.name}</div>
+                  <div className="testimonial-event">{t.event}</div>
                 </div>
               </div>
-            ))
-          ) : (
-            testimonials.map((t, i) => (
-              <div key={i} className="testimonial-card animate-on-scroll" style={{ animationDelay: `${i * 0.15}s` }}>
-                <div className="testimonial-stars">{"★".repeat(t.stars)}</div>
-                <p className="testimonial-text">"{t.text}"</p>
-                <div className="testimonial-author">
-                  <div className="testimonial-avatar">{t.initials}</div>
-                  <div>
-                    <div className="testimonial-name">{t.name}</div>
-                    <div className="testimonial-event">{t.event}</div>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+            </div>
+          ))}
         </div>
-        {googleReviews && (
-          <div className="google-reviews-badge animate-on-scroll">
-            <a href={GOOGLE_MAPS_URL} target="_blank" rel="noopener noreferrer">
-              See all reviews on Google →
-            </a>
-          </div>
-        )}
+        <div className="google-reviews-badge animate-on-scroll">
+          <a href={GOOGLE_MAPS_URL} target="_blank" rel="noopener noreferrer">
+            See all reviews on Google →
+          </a>
+        </div>
       </section>
 
       {/* ─── Booking & Contact ─── */}
