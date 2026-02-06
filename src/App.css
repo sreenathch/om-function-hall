@@ -556,6 +556,24 @@ body {
 }
 .testimonial-name { font-weight: 600; color: white; font-size: 0.9rem; }
 .testimonial-event { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
+.testimonial-avatar-img {
+  width: 42px; height: 42px; border-radius: 50%;
+  object-fit: cover;
+}
+.google-reviews-badge {
+  text-align: center;
+  margin-top: 2rem;
+}
+.google-reviews-badge a {
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.3s;
+}
+.google-reviews-badge a:hover {
+  color: var(--gold-light);
+}
 
 /* ─── Pricing ─── */
 .pricing-grid {

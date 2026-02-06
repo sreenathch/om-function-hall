@@ -1,0 +1,66 @@
+name: Fetch Google Reviews
+
+on:
+  schedule:
+    - cron: '0 6 * * 0'  # Runs every Sunday at 6 AM UTC
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  fetch-reviews:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch Google Reviews
+        run: |
+          PLACE_ID="ChIJgUbEo8cfqokR5lP9_Wh_DaM"
+          API_KEY="${{ secrets.GOOGLE_PLACES_API_KEY }}"
+
+          # Fetch place details with reviews
+          curl -s "https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=reviews,rating,user_ratings_total&key=${API_KEY}" > response.json
+
+          # Extract and format reviews
+          node -e "
+            const data = require('./response.json');
+            if (data.result && data.result.reviews) {
+              const reviews = data.result.reviews
+                .filter(r => r.rating >= 4)  // Only 4+ star reviews
+                .slice(0, 10)  // Max 10 reviews
+                .map(r => ({
+                  author: r.author_name,
+                  rating: r.rating,
+                  text: r.text,
+                  time: r.relative_time_description,
+                  photo: r.profile_photo_url
+                }));
+              const output = {
+                rating: data.result.rating,
+                totalReviews: data.result.user_ratings_total,
+                reviews: reviews,
+                lastUpdated: new Date().toISOString()
+              };
+              console.log(JSON.stringify(output, null, 2));
+            } else {
+              console.log(JSON.stringify({ reviews: [], error: 'No reviews found' }));
+            }
+          " > public/reviews.json
+
+          rm response.json
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add public/reviews.json
+          git diff --staged --quiet || (git commit -m "Update Google reviews" && git push)
+
+      - name: Rebuild and deploy
+        if: success()
+        run: |
+          npm install
+          npm run build
+          npm run deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

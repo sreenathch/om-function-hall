@@ -186,6 +186,19 @@ export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", date: "", event: "", guests: "", message: "" });
   const [showModal, setShowModal] = useState(false);
+  const [googleReviews, setGoogleReviews] = useState(null);
+
+  // Fetch Google Reviews
+  useEffect(() => {
+    fetch('/om-function-hall/reviews.json')
+      .then(res => res.json())
+      .then(data => {
+        if (data.reviews && data.reviews.length > 0) {
+          setGoogleReviews(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -499,23 +512,56 @@ export default function App() {
         <div className="section-header animate-on-scroll">
           <div className="section-tag">Happy Families</div>
           <h2 className="section-title">What Our Guests Say</h2>
-          <p className="section-desc">Hear from families who celebrated their special moments with us.</p>
+          <p className="section-desc">
+            {googleReviews ? (
+              <>Rated <strong>{googleReviews.rating}</strong> ★ based on {googleReviews.totalReviews} Google reviews</>
+            ) : (
+              "Hear from families who celebrated their special moments with us."
+            )}
+          </p>
         </div>
         <div className="testimonials-track">
-          {testimonials.map((t, i) => (
-            <div key={i} className="testimonial-card animate-on-scroll" style={{ animationDelay: `${i * 0.15}s` }}>
-              <div className="testimonial-stars">{"★".repeat(t.stars)}</div>
-              <p className="testimonial-text">"{t.text}"</p>
-              <div className="testimonial-author">
-                <div className="testimonial-avatar">{t.initials}</div>
-                <div>
-                  <div className="testimonial-name">{t.name}</div>
-                  <div className="testimonial-event">{t.event}</div>
+          {googleReviews && googleReviews.reviews.length > 0 ? (
+            googleReviews.reviews.slice(0, 6).map((r, i) => (
+              <div key={i} className="testimonial-card animate-on-scroll" style={{ animationDelay: `${i * 0.15}s` }}>
+                <div className="testimonial-stars">{"★".repeat(r.rating)}</div>
+                <p className="testimonial-text">"{r.text}"</p>
+                <div className="testimonial-author">
+                  {r.photo ? (
+                    <img src={r.photo} alt={r.author} className="testimonial-avatar-img" />
+                  ) : (
+                    <div className="testimonial-avatar">{r.author.split(' ').map(n => n[0]).join('').slice(0, 2)}</div>
+                  )}
+                  <div>
+                    <div className="testimonial-name">{r.author}</div>
+                    <div className="testimonial-event">{r.time}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            testimonials.map((t, i) => (
+              <div key={i} className="testimonial-card animate-on-scroll" style={{ animationDelay: `${i * 0.15}s` }}>
+                <div className="testimonial-stars">{"★".repeat(t.stars)}</div>
+                <p className="testimonial-text">"{t.text}"</p>
+                <div className="testimonial-author">
+                  <div className="testimonial-avatar">{t.initials}</div>
+                  <div>
+                    <div className="testimonial-name">{t.name}</div>
+                    <div className="testimonial-event">{t.event}</div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
+        {googleReviews && (
+          <div className="google-reviews-badge animate-on-scroll">
+            <a href={GOOGLE_MAPS_URL} target="_blank" rel="noopener noreferrer">
+              See all reviews on Google →
+            </a>
+          </div>
+        )}
       </section>
 
       {/* ─── Booking & Contact ─── */}
