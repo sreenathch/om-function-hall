@@ -1,0 +1,11 @@
+# Om Function Hall And Gardens - Kuravi, Telangana
+# https://omfunctionhall.github.io
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://omfunctionhall.github.io/sitemap.xml
+
+# Crawl-delay (optional, for polite crawling)
+Crawl-delay: 1
